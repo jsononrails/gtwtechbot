@@ -1,0 +1,29 @@
+{
+    "name": "gtwtech",
+    "version": "0.0.1",
+    "description": "Scraper/Twitter Bot for GTW Tech",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/jsononrails/gtwtechbot.git"
+    },
+    "keywords": [
+        "gtw",
+        "tech",
+        "mobile"
+    ],
+    "author": "Jason McBride <info@gtw.tech> (http://gtw.tech/)",
+    "license": "BSD-2-Clause",
+    "bugs": {
+        "url": "https://github.com/jsononrails/gtwtechbot/issues"
+    },
+    "dependencies": {
+        "cheerio": "latest",
+        "twit": "latest",
+        "bitly": "latest",
+        "async": "latest",
+        "mongodb": "latest",
+		"md5" : ">=2.x",
+		"request" : "latest"
+    }
+}
