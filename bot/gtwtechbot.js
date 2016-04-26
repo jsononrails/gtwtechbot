@@ -8,10 +8,10 @@ var mongoClient = require('mongodb').MongoClient,
     Bitly = require('bitly'),
     bitly = new Bitly('297477ea34f5d1aee0925ea9a58b7a0b5b9a6141'),
     twitterApi = new Twit({
-        consumer_key: 'NAovfmcnmi8qnk1vCOFF5cGCB', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
-        consumer_secret: '8jaVOeFLTnI6uOPPlgBign4QDfW4kaRMEgljQN73ofIsjECprQ', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
-        access_token: '781570350-vHP9oLlGgowAwfHd3Nt8inxHuIZkF3QAJIIRMSBT', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
-        access_token_secret: 'GLi7SH1iczF6kcKNZLdy9U1DKOkThhgxf5wZiYgIkEMQS', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
+        consumer_key: 'TfvIBJNRRblddTnBBlD7FncXX', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
+        consumer_secret: 'F1Z9m4PQaYBMXd5lam3OB6ghRzw7E7xfTwnswV54VcDQaenQsz', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
+        access_token: '781570350-tn8gaIIZ3c5lIibWGERYttJwsMy8o2KlJJoyREgy', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
+        access_token_secret: 'FM95NHkzxfuScCa7mgSv2sCWu9QRQpScHrEYYOMpE3Yjt', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
     }),
 
     // collectors 
@@ -130,7 +130,7 @@ module.exports = {
 
                 // Fetch the document
                 collection.findOne({
-                    hash: tweet.hash
+                    text: tweet.text
                 }, function(err, item) {
                     assert.equal(null, err);
 
@@ -155,7 +155,7 @@ module.exports = {
 										console.log("Saving Tweet");
 										// insert post hash
 				                        collection.insert({
-				                            hash: tweet.hash
+				                            text: tweet.text
 				                        });
 									}
 									else
