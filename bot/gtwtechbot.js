@@ -41,29 +41,29 @@ module.exports = {
         // collect techcrunch
        setTimeout(
             techCrunch.aggregate(cheerio, bitly, request, md5,  this.appendTweet),
-            5000);
+		   5000);
 
         // collect endgadget
-       /*setTimeout(
+        /*setTimeout(
             endgadget.aggregate(parseXML, bitly, request, md5,  this.appendTweet),
-            10000);*/
-	  
+            10000);
+	  */
       
   		// collect verge
-        setTimeout(
+       setTimeout(
             verge.aggregate(cheerio, bitly, request, md5,  this.appendTweet),
             15000);
 
         // collect cnet
-        setTimeout(
-            cnet.aggregate(cheerio, bitly, request, md5,  this.appendTweet),
+       /* setTimeout(
+            cnet.aggregate(parseXML, bitly, request, md5,  this.appendTweet),
             20000);
 
         // collect techno buffalo
        setTimeout(
         	technobuffalo.aggregate(cheerio, bitly, request, md5, this.appendTweet),
         	25000);
-
+*/
 		// collect ars technica
         setTimeout(
         	arstechnica.aggregate(cheerio, bitly, request, md5, this.appendTweet),
