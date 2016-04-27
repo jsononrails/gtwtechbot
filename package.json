@@ -24,6 +24,7 @@
         "async": "latest",
         "mongodb": "latest",
 		"md5" : ">=2.x",
-		"request" : "latest"
+		"request" : "latest",
+		"xml2js" : "latest"
     }
 }

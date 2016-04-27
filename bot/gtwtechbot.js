@@ -5,13 +5,14 @@ var mongoClient = require('mongodb').MongoClient,
     Twit = require('twit'),
 	md5 = require('md5'),
     cheerio = require("cheerio"),
+	parseXML = require('xml2js').parseString;
     Bitly = require('bitly'),
     bitly = new Bitly('297477ea34f5d1aee0925ea9a58b7a0b5b9a6141'),
     twitterApi = new Twit({
-        consumer_key: 'TfvIBJNRRblddTnBBlD7FncXX', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
-        consumer_secret: 'F1Z9m4PQaYBMXd5lam3OB6ghRzw7E7xfTwnswV54VcDQaenQsz', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
-        access_token: '781570350-tn8gaIIZ3c5lIibWGERYttJwsMy8o2KlJJoyREgy', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
-        access_token_secret: 'FM95NHkzxfuScCa7mgSv2sCWu9QRQpScHrEYYOMpE3Yjt', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
+        consumer_key: 'uRqwvIyhOWGnvNdkh2JasUpTE', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
+        consumer_secret: '5SdqctrFR27c6Zm7AsEHVci4kOggKYVkaVPWmTuMAR2BtkKZit', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
+        access_token: '781570350-gfgZuDPgZqdHU294Bi9zkNAGKerOgEMODhTWaxw0', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
+        access_token_secret: 'yYOjBYlpk9drRXblfEeL0lkAA8du0OMIOjnFsaLThWtR6', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
     }),
 
     // collectors 
@@ -38,15 +39,15 @@ module.exports = {
     aggregateNews: function() {
 
         // collect techcrunch
-        setTimeout(
+       setTimeout(
             techCrunch.aggregate(cheerio, bitly, request, md5,  this.appendTweet),
             5000);
 
         // collect endgadget
-       /* setTimeout(
-            endgadget.aggregate(cheerio, bitly, request, md5,  this.appendTweet),
-            10000);
-	  */
+       /*setTimeout(
+            endgadget.aggregate(parseXML, bitly, request, md5,  this.appendTweet),
+            10000);*/
+	  
       
   		// collect verge
         setTimeout(
@@ -135,7 +136,7 @@ module.exports = {
                     assert.equal(null, err);
 
                     if (item !== null && tweet.text === item.text) {
-						conole.log('Tweet already exists: ' + tweet.text);
+						console.log('Tweet already exists: ' + tweet.text);
                     } else {
 
                         postTweet(tweet.tweet, delay);
