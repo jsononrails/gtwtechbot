@@ -7,10 +7,10 @@ var mongoClient = require('mongodb').MongoClient,
     Bitly = require('bitly'),
     bitly = new Bitly('297477ea34f5d1aee0925ea9a58b7a0b5b9a6141'),
     twitterApi = new Twit({
-        consumer_key: 'eG1WVmKdvHgIiFJPWr8rDdhY3', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
-        consumer_secret: 'YDznS0E5N4x0MkQstXlIRVdW2YwU9VtJRw941O2nXKa6xtiTAO', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
-        access_token: '781570350-AaqycCXFDvOpIuSnB7GL3vGPnzRP7aNvL9hKvFkO', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
-        access_token_secret: 'HNoOCIoJk1EpK4wzhgDcYbRwYvArcOkfYzpPLLnucvEfg', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
+        consumer_key: 'OzZaiXkHRcbH94CIHgZpboM3e', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
+        consumer_secret: 'F0eBN48nrb7cZeaxb3UT4TkUZyqdZDP9TWWK9Ml2TLdZpyRlBb', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
+        access_token: '781570350-EHEAe950mgp8Gyarbt9t98u3SnVamvFRWkfPnPsG', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
+        access_token_secret: 'a2BWxPMBEXYZxhXXgXqu29swb1EdbxNFwBnWq5fTIpIwo', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
     }),
 
     // collectors 
@@ -142,7 +142,6 @@ module.exports = {
                         console.log(error);
                     }).then(function() {
 						if(tweet.status_code == 200) {
-							console.log('Posting tweet: ' + tweet.tweet);
 							self.postTweet(tweet, delay);
 						}
 						else
@@ -153,11 +152,7 @@ module.exports = {
         });
     },
 	
-    postTweet: function(tweet, delay) {
-		console.log('posting');
-        var randTime = Math.floor(Math.random() * (1200000 - 300000) + 300000);
-		
-		console.log('Post ' + (i+1) + ' in ' + ((randTime / 1000)/60) + ' minutes \n\n' + tw.tweet + ' link: ' + tw.link);
+    postTweet: function(tw, i) {
 		
 		mongoClient.connect(url, function(err, db) { 
             
@@ -166,17 +161,17 @@ module.exports = {
 			
             // Fetch the document
             collection.findOne({
-                text: tweet.text
+                text: tw.text
             }, function(err, item) {
                 assert.equal(null, err);
 
-                if (item !== null && tweet.text === item.text) {
-					console.log('Tweet already exists: ' + tweet.text);
+                if (item !== null && tw.text === item.text) {
+					console.log('Tweet already exists: ' + tw.text);
                 } else {
 
-                    postTweet(tweet.tweet, delay);
+                    postingTweet(tw.tweet, i);
 
-                    function postTweet(tw, i) {
+                    function postingTweet(tw, i) {
                         
                         var randTime = Math.floor(Math.random() * (1200000 - 300000) + 300000);
 						
@@ -191,7 +186,7 @@ module.exports = {
 									console.log("Saving Tweet");
 									// insert post
 			                        collection.insert({
-			                            text: tweet.text
+			                            text: tw
 			                        });
 								}
 								else
