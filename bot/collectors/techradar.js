@@ -6,7 +6,7 @@ module.exports = {
     aggregate: function(cb) {
 		var tweets = [];
 		var options = {
-			url: 'http://www.cnet.com/rss/all/',
+			url: 'http://feeds.webservice.techradar.com/us/rss',
 			method: 'GET'
 		};
         var req = request(options),
@@ -36,9 +36,9 @@ module.exports = {
 			
 			while(item = stream.read()) {
 				var tweet = {
-					text: item.title.replace("- CNET", ""),
-					tweet: item.title.replace("- CNET", ""),
-					link: item.link.replace("/#ftag=CADf328eec", "")
+					text: item.title,
+					tweet: item.title,
+					link: item.link
 				};
 				tweets.push(tweet);
 			}

@@ -25,6 +25,7 @@
         "mongodb": "latest",
 		"md5" : ">=2.x",
 		"request" : "latest",
-		"xml2js" : "latest"
+		"xml2js" : "latest",
+		"feedparser" : "latest"
     }
 }

@@ -3,98 +3,89 @@ var mongoClient = require('mongodb').MongoClient,
     assert = require('assert'),
     url = 'mongodb://localhost:27017/gtwtech',
     Twit = require('twit'),
-	md5 = require('md5'),
-    cheerio = require("cheerio"),
 	parseXML = require('xml2js').parseString;
     Bitly = require('bitly'),
     bitly = new Bitly('297477ea34f5d1aee0925ea9a58b7a0b5b9a6141'),
     twitterApi = new Twit({
-        consumer_key: 'uRqwvIyhOWGnvNdkh2JasUpTE', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
-        consumer_secret: '5SdqctrFR27c6Zm7AsEHVci4kOggKYVkaVPWmTuMAR2BtkKZit', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
-        access_token: '781570350-gfgZuDPgZqdHU294Bi9zkNAGKerOgEMODhTWaxw0', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
-        access_token_secret: 'yYOjBYlpk9drRXblfEeL0lkAA8du0OMIOjnFsaLThWtR6', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
+        consumer_key: 'eG1WVmKdvHgIiFJPWr8rDdhY3', //process.env.PICKTWOBOT_TWIT_CONSUMER_KEY,
+        consumer_secret: 'YDznS0E5N4x0MkQstXlIRVdW2YwU9VtJRw941O2nXKa6xtiTAO', //process.env.PICKTWOBOT_TWIT_CONSUMER_SECRET,
+        access_token: '781570350-AaqycCXFDvOpIuSnB7GL3vGPnzRP7aNvL9hKvFkO', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN,
+        access_token_secret: 'HNoOCIoJk1EpK4wzhgDcYbRwYvArcOkfYzpPLLnucvEfg', //process.env.PICKTWOBOT_TWIT_ACCESS_TOKEN_SECRET
     }),
 
     // collectors 
-    techCrunch = require('./collectors/techcrunch'),
+    techcrunch = require('./collectors/techcrunch'),
     endgadget = require('./collectors/endgadget'),
-    verge = require('./collectors/verge'),
-    technobuffalo = require('./collectors/technobuffalo'),
     cnet = require('./collectors/cnet');
+	techradar = require('./collectors/techradar');
+	wired = require('./collectors/wired');
+	verge = require('./collectors/verge'),
+	technobuffalo = require('./collectors/technobuffalo'),
     arstechnica = require('./collectors/arstechnica');
 
 // final tweets list
 tweets = [];
+var self;
 
 module.exports = {
-
+	tweets: tweets,
+	
     appendTweet: function(tw) {
-        tweets.push(tw);
+        this.tweets.push(tw);
     },
+	
+	appendTweets: function(tws) {
+		for(i=0; i < tws.length; i++) {
+			this.tweets.push(tws[i]);
+		}
+	},
 
     viewTweets: function() {
-        console.log(tweets);
+        console.log(this.tweets);
     },
 
     aggregateNews: function() {
-
-        // collect techcrunch
-       setTimeout(
-            techCrunch.aggregate(cheerio, bitly, request, md5,  this.appendTweet),
-		   5000);
-
-        // collect endgadget
-        /*setTimeout(
-            endgadget.aggregate(parseXML, bitly, request, md5,  this.appendTweet),
-            10000);
-	  */
-      
-  		// collect verge
-       setTimeout(
-            verge.aggregate(cheerio, bitly, request, md5,  this.appendTweet),
-            15000);
-
-        // collect cnet
-       /* setTimeout(
-            cnet.aggregate(parseXML, bitly, request, md5,  this.appendTweet),
-            20000);
-
-        // collect techno buffalo
-       setTimeout(
-        	technobuffalo.aggregate(cheerio, bitly, request, md5, this.appendTweet),
-        	25000);
-*/
-		// collect ars technica
-        setTimeout(
-        	arstechnica.aggregate(cheerio, bitly, request, md5, this.appendTweet),
-        	30000);
+		self = this;
 		
-    },
+        // collect endgadget
+        setTimeout(
+            techcrunch.aggregate(self.appendTweets),
+            10000);
+	
+	    setTimeout(
+	    	endgadget.aggregate(self.appendTweets),
+	        20000);
+			
+		setTimeout(
+			cnet.aggregate(self.appendTweets),
+		    30000);
+		
+		setTimeout(
+			techradar.aggregate(self.appendTweets),
+		    40000);
 
-    dbTest: function() {
-        mongoClient.connect(url, function(err, db) {
-            assert.equal(null, err);
-            console.log("Connected correctly to mongo server.");
-            db.close();
-        });
-    },
-
-    dbCreateCollection: function() {
-        mongoClient.connect(url, function(err, db) {
-            assert.equal(null, err);
-            console.log("Connected correctly to mongo server.");
-
-            db.createCollection("post", {
-                capped: true,
-                size: 5242880,
-                max: 5000
-            });
-
-            db.close();
-        });
+		setTimeout(
+			wired.aggregate(self.appendTweets),
+		    50000);
+		
+		setTimeout(
+			verge.aggregate(self.appendTweets),
+		    60000);
+/*			
+		setTimeout(
+			technobuffalo.aggregate(self.appendTweets),
+		    70000);
+*/				
+		setTimeout(
+			arstechnica.aggregate(self.appendTweets),
+		    60000);
+			
+		setTimeout(self.shuffleTweets, 10000);	
+	
     },
 
     shuffleTweets: function() {
+
         var m = tweets.length,
             t, i;
 
@@ -111,65 +102,107 @@ module.exports = {
         }
 
         tweets = tweets;
+		
+		self.postTweets(self.insertPost);
     },
 
     postTweets: function() {
 
+		var insertPost = this.insertPost;
         mongoClient.connect(url, function(err, db) {
             assert.equal(null, err);
 
             var collection = db.collection("post");
 
             for (i = 0; i < tweets.length; i++) {
-
-                var tw = tweets[i];
-                insertHash(tw, i, collection);
-
+            	self.insertPost(tweets[i], i, collection);
             }
-
-            function insertHash(tweet, delay, collection) {
-
-                // Fetch the document
-                collection.findOne({
-                    text: tweet.text
-                }, function(err, item) {
-                    assert.equal(null, err);
-
-                    if (item !== null && tweet.text === item.text) {
-						console.log('Tweet already exists: ' + tweet.text);
-                    } else {
-
-                        postTweet(tweet.tweet, delay);
-
-                        function postTweet(tw, i) {
-                            
-                            var randTime = Math.floor(Math.random() * (1200000 - 300000) + 300000);
-							
-							console.log('Post ' + (i+1) + ' in ' + ((randTime / 1000)/60) + ' minutes');
-							
-                            setTimeout(function() {
-                                twitterApi.post('statuses/update', {
-                                    status: tw
-                                }, function(err, data, response) {
-                                    if (!err) {
-                                        console.log("Tweet successful");
-										console.log("Saving Tweet");
-										// insert post hash
-				                        collection.insert({
-				                            text: tweet.text
-				                        });
-									}
-									else
-										console.log(err);
-                                })
-                            }, i * randTime); // random
-                        }
-                    }
-                    return;
-                });
-            }
-
         });
 
+    },
+	
+    insertPost: function(tweet, delay, collection) {
+
+        // Fetch the document
+        collection.findOne({
+            text: tweet.text
+        }, function(err, item) {
+            assert.equal(null, err);
+
+            if (item !== null && tweet.text === item.text) {
+				console.log('Tweet already exists: ' + tweet.text);
+            } else {
+				
+                // compress url
+                bitly.shorten(tweet.link)
+                    .then(function(response) {
+                        tweet.tweet = tweet.tweet + ' ' + response.data.url;
+						tweet.status_code = response.status_code;
+                    }, function(error) {
+                        console.log(error);
+                    }).then(function() {
+						if(tweet.status_code == 200) {
+							console.log('Posting tweet: ' + tweet.tweet);
+							self.postTweet(tweet, delay);
+						}
+						else
+							console.log('Bitly error: ' + tweet.status_code);
+                    });		
+            }
+            return;
+        });
+    },
+	
+    postTweet: function(tweet, delay) {
+		console.log('posting');
+        var randTime = Math.floor(Math.random() * (1200000 - 300000) + 300000);
+		
+		console.log('Post ' + (i+1) + ' in ' + ((randTime / 1000)/60) + ' minutes \n\n' + tw.tweet + ' link: ' + tw.link);
+		
+		mongoClient.connect(url, function(err, db) { 
+            
+			assert.equal(null, err);
+            var collection = db.collection("post");
+			
+            // Fetch the document
+            collection.findOne({
+                text: tweet.text
+            }, function(err, item) {
+                assert.equal(null, err);
+
+                if (item !== null && tweet.text === item.text) {
+					console.log('Tweet already exists: ' + tweet.text);
+                } else {
+
+                    postTweet(tweet.tweet, delay);
+
+                    function postTweet(tw, i) {
+                        
+                        var randTime = Math.floor(Math.random() * (1200000 - 300000) + 300000);
+						
+						console.log('Post ' + (i+1) + ' in ' + ((randTime / 1000)/60) + ' minutes');
+						
+                        setTimeout(function() {
+                            twitterApi.post('statuses/update', {
+                                status: tw
+                            }, function(err, data, response) {
+                                if (!err) {
+                                    console.log("Tweet successful");
+									console.log("Saving Tweet");
+									// insert post
+			                        collection.insert({
+			                            text: tweet.text
+			                        });
+								}
+								else
+									console.log(err);
+                            })
+                        }, i * randTime); // random
+                    }
+                }
+                return;
+            });
+			
+		});
     }
 };

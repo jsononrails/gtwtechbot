@@ -1,46 +1,52 @@
+var FeedParser = require('feedparser');
+var request = require('request');
+
 module.exports = {
+	
+    aggregate: function(cb) {
+		var tweets = [];
+		var options = {
+			url: 'http://www.technobuffalo.com/tag/rss-feeds/',
+			method: 'GET'
+		};
+        var req = request(options),
+		feedparser = new FeedParser();
+		
+		req.on('error', function(error) {
+			console.log('Http Request error: ' + error);
+		});
+		
+		req.on('response', function(res) {
+			var stream = this;
+			
+			if(res.statusCode != 200) return this.emit('error', new Error('Bad status code'));
 
-    aggregate: function(cheerio, bitly, request, md5, callback) {
-        request("http://www.technobuffalo.com/", function(error, response, body) {
+			stream.pipe(feedparser);
+		});
+		
+		feedparser.on('error', function(error) {
+			console.log('Feed parser error: ' + error);
+		});
+		
+		feedparser.on('readable', function() {
 
-            if (error) {
-                console.log("Couldn’t get page because of error: " + error);
-                return;
-            }
+			var stream = this,
+				meta = this.meta,
+			item;
+			
+			while(item = stream.read()) {
+				var tweet = {
+					text: item.title,
+					tweet: item.title,
+					link: item.link
+				};
+				tweets.push(tweet);
+			}
+		})
+		
+		feedparser.on('end', function() {
+			cb(tweets);
+		});
 
-            // load the body of the page into Cheerio so we can traverse the DOM
-            var $ 	  	= cheerio.load(body),
-				links 	= $("h2[itemprop=headline]").children("a");
-				
-			console.log("Techno Buffalo total posts: " + links.length)
-            
-			links.each(function(i, link) {
-            
-    			// get the href attribute of each link
-                var text = $(link).text(),
-                    url = $(link).attr("href"),
-                    shortUrl = "";
-
-                function shortResult(p) {
-                    
-					var tweet = { };
-						tweet.text = text;
-						tweet.tweet = text + ' ' + p + ' ' + 'via @TechnoBuffalo';
-						tweet.link = p;
-						tweet.hash = md5(tweet.text);
-						
-					callback(tweet);
-                }
-				
-              // compress url
-              bitly.shorten(url)
-			  .then(function(response){
-                  shortResult(response.data.url);
-                }, function(error) {
-				  console.log(error);  	
-              });
-			  
-            });
-        });
     }
 };
