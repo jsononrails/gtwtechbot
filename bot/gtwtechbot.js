@@ -166,7 +166,7 @@ module.exports = {
                 assert.equal(null, err);
 
                 if (item !== null && tw.text === item.text) {
-					console.log('Tweet already exists: ' + tw.text);
+					console.log('Tweet already exists: ' + tw.text + ' = ' + item.text);
                 } else {
 
                     postingTweet(tw.tweet, i);
@@ -186,7 +186,7 @@ module.exports = {
 									console.log("Saving Tweet");
 									// insert post
 			                        collection.insert({
-			                            text: tw
+			                            text: tw.text
 			                        });
 								}
 								else
